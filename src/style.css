@@ -1,0 +1,1062 @@
+/* ============ Apple-style design system ============
+   Shape scale (stated rule, never violated):
+     cards/panels 18 · inputs/buttons/icon-tiles 12 · segmented shell 10 (inner 8 = shell−2)
+     hit-area radius 12 · tracks & pills full/height-derived
+   Accent: one blue (--accent) for every interactive/selected state.
+   Icon tiles carry per-tool hues following the iOS Settings pattern
+   (decoration, not accent); status colors (green/orange/red) are semantic only.
+   Type: one display size per screen — home owns the 34px large title,
+   tool screens own the 34px result; pushed-screen titles sit at 28 (Title 1).
+   All type in rem so user text-size settings scale the layout (Dynamic Type). */
+
+:root {
+  --bg: #f5f5f7;
+  --bg-elevated: rgba(255, 255, 255, 0.72);
+  --card: #ffffff;
+  --text: #1d1d1f;
+  --text-2: #6e6e73;
+  --text-3: #86868b;
+  --accent: #0071e3;
+  --accent-press: #0060c0;
+  --sep: rgba(0, 0, 0, 0.08);
+  --field: rgba(120, 120, 128, 0.12);
+  --field-focus: rgba(120, 120, 128, 0.08);
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.04), 0 8px 24px rgba(0, 0, 0, 0.06);
+  --radius: 18px;
+  --radius-sm: 12px;
+  --green: #34c759;
+  --orange: #ff9500;
+  --red: #ff3b30;
+  --red-text: #d70015; /* contrast-passing error text on light surfaces */
+  --yellow: #ffcc00;
+  --font: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display', 'Helvetica Neue',
+    'Segoe UI', Roboto, sans-serif;
+  --topbar-h: 64px;
+}
+
+/* Theme resolved to data-theme by the no-flash bootstrap + settings manager:
+   [data-theme='dark'] swaps the whole token set. */
+:root[data-theme='dark'] {
+  --bg: #000000;
+  --bg-elevated: rgba(28, 28, 30, 0.72);
+  --card: #1c1c1e;
+  --text: #f5f5f7;
+  --text-2: #a1a1a6;
+  --text-3: #6e6e73;
+  --accent: #0a84ff;
+  --accent-press: #409cff;
+  --sep: rgba(255, 255, 255, 0.1);
+  --field: rgba(120, 120, 128, 0.24);
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 24px rgba(0, 0, 0, 0.4);
+  --red-text: #ff453a; /* Apple systemRed, dark theme */
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 1.0625rem;
+  line-height: 1.47;
+  font-optical-sizing: auto;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  min-height: 100dvh;
+  overscroll-behavior-y: none;
+}
+
+/* ---------- Top bar (translucent material, scroll-edge not a hard divider) ---------- */
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: var(--bg-elevated);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  backdrop-filter: saturate(180%) blur(20px);
+  padding-top: env(safe-area-inset-top);
+}
+
+.topbar::after {
+  /* scroll-edge: content fades under the floating chrome instead of hitting a line */
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 18px;
+  transform: translateY(100%);
+  pointer-events: none;
+  background: linear-gradient(to bottom, color-mix(in srgb, var(--bg) 55%, transparent), transparent);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.topbar.has-underlap::after {
+  opacity: 1;
+}
+
+.topbar-inner {
+  max-width: 1024px;
+  margin: 0 auto;
+  padding: 12px 20px;
+  display: flex;
+  flex-wrap: wrap; /* chrome reflows at any text scale — never overlaps */
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 12px;
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px; /* ≥44pt tap target */
+  padding-right: 4px;
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text);
+  text-decoration: none;
+}
+
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.badge {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-2);
+  background: var(--field);
+  padding: 4px 10px;
+  border-radius: 100px;
+  white-space: nowrap;
+}
+
+/* ---------- Layout ---------- */
+/* ---------- Stacked fluid views ---------- */
+#app {
+  position: relative;
+  max-width: 1024px;
+  margin: 0 auto;
+  padding: 24px 20px 60px;
+}
+
+.home-layer {
+  /* the layer push/pop parallaxes underneath; never display:none so motion stays continuous */
+  will-change: transform;
+}
+
+.view {
+  position: fixed;
+  inset: 0;
+  top: 0;
+  z-index: 40;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  background: var(--bg);
+  padding-top: calc(var(--topbar-h) + env(safe-area-inset-top));
+  padding-bottom: env(safe-area-inset-bottom);
+  -webkit-overflow-scrolling: touch;
+}
+
+.view.is-animating {
+  will-change: transform;
+}
+
+.view-inner {
+  max-width: 1024px;
+  margin: 0 auto;
+  padding: 24px 20px 60px;
+}
+
+.stack-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 39;
+  background: #000;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.large-title {
+  font-size: clamp(1.875rem, 5vw, 2.125rem);
+  font-weight: 700;
+  letter-spacing: -0.026em;
+  line-height: 1.1;
+  margin: 8px 0 6px;
+}
+
+/* One display size per screen: on tool screens the result owns 34px,
+   so the pushed-screen title steps down to Title 1 (28). */
+.view .large-title {
+  font-size: 1.75rem;
+  letter-spacing: -0.022em;
+}
+
+.subtitle {
+  font-size: 1.0625rem;
+  color: var(--text-2);
+  margin: 0 0 24px;
+}
+
+.section-title {
+  font-size: 1.375rem;
+  font-weight: 700;
+  letter-spacing: -0.019em;
+  line-height: 1.2;
+  margin: 28px 0 12px;
+}
+
+.footer {
+  text-align: center;
+  color: var(--text-3);
+  font-size: 0.8125rem;
+  padding: 24px 16px calc(24px + env(safe-area-inset-bottom));
+  border-top: 0.5px solid var(--sep);
+}
+
+/* ---------- Home tool grid ---------- */
+.tool-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 14px;
+}
+
+.tool-card {
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-card);
+  border: none;
+  padding: 18px 16px;
+  text-align: left;
+  cursor: pointer;
+  font-family: var(--font);
+  color: var(--text);
+  transition: transform 180ms cubic-bezier(0.2, 0.9, 0.3, 1), box-shadow 0.15s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.tool-card:hover {
+  transform: translateY(-2px);
+}
+
+.tool-card:active {
+  /* press feedback lands within the 100–150ms window, on press-in */
+  transform: scale(0.97);
+  transition: transform 120ms ease-out;
+}
+
+.tool-card .icon {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-sm);
+  display: grid;
+  place-items: center;
+  font-size: 1.5rem;
+  color: #fff;
+}
+
+.tool-card .icon svg {
+  display: block;
+}
+
+.tool-card .name {
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.25;
+}
+
+.tool-card .desc {
+  font-size: 0.8125rem;
+  color: var(--text-2);
+  line-height: 1.38;
+  letter-spacing: 0.005em; /* small text wants a hair of positive tracking */
+}
+
+/* ---------- Panels (tool views) ---------- */
+.panel {
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-card);
+  padding: 24px;
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--accent);
+  text-decoration: none;
+  font-size: 1.0625rem;
+  font-weight: 400;
+  margin-bottom: 4px;
+  padding: 10px 12px 10px 4px; /* ≥44px hit target */
+  border-radius: var(--radius-sm);
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.back-link:active {
+  opacity: 0.55;
+  transition: none;
+}
+
+/* ---------- Form controls ---------- */
+label.field-label {
+  display: block;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.045em;
+  line-height: 1.3;
+  color: var(--text-2);
+  margin: 16px 0 6px;
+}
+
+input[type='text'],
+input[type='number'],
+input[type='password'],
+textarea,
+select {
+  width: 100%;
+  font-family: var(--font);
+  font-size: 1.0625rem;
+  color: var(--text);
+  background: var(--field);
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  outline: none;
+  transition: background 0.15s, border-color 0.15s;
+  -webkit-appearance: none;
+  appearance: none;
+  touch-action: manipulation;
+}
+
+textarea {
+  resize: vertical;
+  min-height: 100px;
+  line-height: 1.45;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  background: var(--field-focus);
+  border-color: var(--accent);
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--text-3);
+}
+
+.input-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.input-row > * {
+  flex: 1;
+  min-width: 0; /* fields shrink instead of overflowing at big scales */
+}
+
+/* Label-above-input pairing: works side-by-side on wide screens,
+   stacks label+field together on narrow screens and big text scales. */
+.field {
+  flex: 1 1 8rem;
+  min-width: 0;
+}
+
+.input-row .field-label {
+  margin-top: 0;
+}
+
+/* Button inside an input row keeps its own size */
+.input-row .btn {
+  flex: 0 0 auto;
+  width: auto;
+  margin-top: 0;
+  white-space: nowrap;
+}
+
+input[type='range'] {
+  width: 100%;
+  accent-color: var(--accent);
+}
+
+input[type='checkbox'] {
+  accent-color: var(--accent);
+  width: 18px;
+  height: 18px;
+}
+
+/* ---------- Segmented control ---------- */
+.segmented {
+  display: flex;
+  flex-wrap: wrap; /* segments wrap onto new lines as text grows — no cramming */
+  background: var(--field);
+  border-radius: 10px;
+  padding: 2px;
+  gap: 2px;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  touch-action: manipulation;
+}
+
+.segmented::-webkit-scrollbar {
+  display: none;
+}
+
+.segmented button {
+  flex: 1 1 auto;
+  min-width: 60px;
+  border: none;
+  background: transparent;
+  font-family: var(--font);
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text);
+  padding: 7px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.segmented button:active {
+  transition: none; /* instant feedback on press */
+  filter: brightness(0.92);
+}
+
+.segmented button.active {
+  background: var(--card);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+}
+
+html[data-theme='dark'] .segmented button.active {
+  background: #636366;
+}
+
+/* ---------- Buttons ---------- */
+.btn {
+  font-family: var(--font);
+  font-size: 1.0625rem;
+  font-weight: 600;
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 13px 20px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: var(--field); /* never UA default — keeps dark mode coherent */
+  color: var(--accent);
+  transition: transform 150ms cubic-bezier(0.2, 0.9, 0.3, 1), background 0.15s;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.btn svg {
+  display: block;
+  flex-shrink: 0;
+}
+
+.btn:active {
+  transform: scale(0.97);
+  transition: transform 120ms ease-out; /* press feedback within 100–150ms, on press-in */
+}
+
+.btn[hidden] {
+  display: none;
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: #fff;
+  width: 100%;
+  margin-top: 20px;
+}
+
+.btn-primary:hover {
+  background: var(--accent-press);
+}
+
+.btn-secondary {
+  background: var(--field);
+  color: var(--accent);
+  width: 100%;
+  margin-top: 10px;
+}
+
+.btn.pill {
+  background: var(--accent);
+  color: #fff;
+  font-size: 0.875rem;
+  padding: 7px 16px;
+  border-radius: 100px;
+}
+
+/* ---------- Results ---------- */
+.result-card {
+  background: var(--field);
+  border-radius: var(--radius-sm);
+  padding: 18px 16px;
+  margin-top: 18px;
+  text-align: center;
+}
+
+.result-value {
+  font-size: 2.125rem;
+  font-weight: 700;
+  letter-spacing: -0.026em;
+  font-variant-numeric: tabular-nums;
+  word-break: break-all;
+  -webkit-user-select: text;
+  user-select: text; /* data users may want to copy */
+}
+
+.result-label {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.045em;
+  line-height: 1.3;
+  color: var(--text-2);
+  margin-bottom: 4px;
+}
+
+.result-sub {
+  font-size: 0.875rem;
+  color: var(--text-2);
+  margin-top: 6px;
+}
+
+.stat-row {
+  display: flex;
+  flex-wrap: wrap;
+  row-gap: 2px;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 12px 2px;
+  border-bottom: 0.5px solid var(--sep);
+  font-size: 0.9375rem;
+}
+
+.stat-row:last-child {
+  border-bottom: none;
+}
+
+.stat-row .k {
+  color: var(--text-2);
+}
+
+.stat-row .v {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+.hint {
+  font-size: 0.8125rem;
+  color: var(--text-3);
+  line-height: 1.4;
+  letter-spacing: 0.005em;
+  margin: 10px 0 0;
+}
+
+.inline-error {
+  font-size: 0.875rem;
+  line-height: 1.4;
+  color: var(--red-text);
+  margin: 8px 0 0;
+}
+
+/* ---------- Password output ---------- */
+.pw-output {
+  display: flex;
+  gap: 8px;
+  align-items: stretch;
+}
+
+.pw-output input {
+  font-family: 'SF Mono', ui-monospace, Menlo, Consolas, monospace;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.pw-output .btn {
+  width: auto;
+  margin: 0;
+  flex-shrink: 0;
+  font-size: 0.9375rem;
+  padding: 10px 16px;
+}
+
+.strength-bar {
+  height: 4px;
+  border-radius: 2px; /* height-derived pill track */
+  background: var(--field);
+  margin-top: 10px;
+  overflow: hidden;
+}
+
+.strength-bar > div {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.3s, background 0.3s;
+}
+
+/* ---------- QR ---------- */
+.qr-canvas-wrap {
+  display: grid;
+  place-items: center;
+  margin-top: 16px;
+  padding: 16px;
+  background: #fff;
+  border-radius: var(--radius-sm);
+  min-height: 120px;
+}
+
+.qr-canvas-wrap canvas {
+  max-width: 100%;
+  height: auto;
+  image-rendering: pixelated;
+}
+
+.qr-video-wrap {
+  position: relative;
+  margin-top: 16px;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  background: #000;
+  display: none;
+}
+
+.qr-video-wrap video {
+  width: 100%;
+  display: block;
+  min-height: 240px;
+  object-fit: cover;
+}
+
+/* ---------- Checkbox row ---------- */
+.check-row {
+  display: flex;
+  flex-wrap: wrap;
+  row-gap: 4px;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 0;
+  font-size: 0.9375rem;
+  border-bottom: 0.5px solid var(--sep);
+}
+
+.check-row:last-of-type {
+  border-bottom: none;
+}
+
+.check-row label {
+  cursor: pointer;
+  flex: 1 1 10rem;
+  min-width: 0;
+}
+
+.check-row .opt-hint {
+  color: var(--text-3);
+  font-size: 0.8125rem;
+}
+
+/* ---------- Theme switch brightness ease ---------- */
+/* Applied for ~350ms around a theme change (see settings.ts): colors cross-fade
+   instead of snapping dark↔light (skill §14). Color-only: no motion involved. */
+html.theme-fading,
+html.theme-fading * {
+  transition:
+    background-color 0.28s ease,
+    color 0.28s ease,
+    border-color 0.28s ease,
+    fill 0.28s ease,
+    stroke 0.28s ease !important;
+}
+
+/* ---------- Secondary panel spacing ---------- */
+/* Replace per-tool inline margin-top styles; one rhythm for stacked panels. */
+.panel-gap {
+  margin-top: 0.875rem;
+}
+
+.stat-row .result-value {
+  font-size: 1.0625rem; /* 17px equivalent in rem — scales with text size */
+}
+
+/* ---------- Settings side menu (drawer) ---------- */
+.drawer-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  background: #000;
+  opacity: 0;
+  visibility: hidden;
+}
+
+.drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 61;
+  width: min(320px, 88vw);
+  /* Big surfaces read as thicker material: translucent + stronger blur/deeper
+     shadow than small chips (skill §12). Sits over the scrim, not on chrome. */
+  background: var(--card); /* fallback for pre-color-mix browsers */
+  background: color-mix(in srgb, var(--card) 88%, transparent);
+  -webkit-backdrop-filter: blur(30px) saturate(180%);
+  backdrop-filter: blur(30px) saturate(180%);
+  border-left: 0.5px solid var(--sep);
+  box-shadow: -24px 0 64px rgba(0, 0, 0, 0.35); /* big surface = thicker material */
+  transform: translate3d(100%, 0, 0);
+  visibility: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  touch-action: pan-y;
+  padding: calc(env(safe-area-inset-top) + 16px) 20px calc(env(safe-area-inset-bottom) + 28px);
+}
+
+.drawer.is-animating {
+  will-change: transform;
+}
+
+.drawer-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 4px;
+}
+
+.drawer-title {
+  font-size: 1.375rem;
+  font-weight: 700;
+  letter-spacing: -0.019em;
+  line-height: 1.2;
+  margin: 0;
+}
+
+body.menu-open {
+  overflow: hidden; /* settings is a modal task — background stays put */
+}
+body.menu-open .view {
+  overflow: hidden; /* a pushed tool view is its own scroller — lock it as well */
+}
+
+/* Edge-swipe in progress: suppress text selection across the gesture */
+body.swiping,
+body.swiping * {
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* ---------- Saved lists (QR history, Wi-Fi, passwords) + icon actions ---------- */
+.list-empty {
+  font-size: 0.8125rem;
+  color: var(--text-3);
+  line-height: 1.45;
+  letter-spacing: 0.005em;
+  margin: 4px 0 0;
+}
+
+.list-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 8px;
+  padding: 10px 0;
+  border-bottom: 0.5px solid var(--sep);
+}
+
+.list-row:last-child {
+  border-bottom: none;
+}
+
+.list-main {
+  flex: 1 1 10rem;
+  min-width: 0;
+}
+
+.list-title {
+  display: block;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.list-sub {
+  display: block;
+  font-size: 0.8125rem;
+  color: var(--text-2);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.4;
+  word-break: break-all;
+}
+
+.list-sub.mono {
+  font-family: 'SF Mono', ui-monospace, Menlo, Consolas, monospace;
+  font-weight: 600;
+}
+
+.list-actions {
+  display: flex;
+  gap: 0;
+  margin-left: auto;
+}
+
+.icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 10px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--accent);
+  cursor: pointer;
+  transition: transform 120ms ease-out, background 0.15s;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.icon-btn:active {
+  transform: scale(0.92);
+  background: var(--field);
+}
+
+.icon-btn svg {
+  display: block;
+}
+
+.icon-btn.danger {
+  color: var(--red-text);
+}
+
+/* Password reveal field */
+.reveal-field {
+  position: relative;
+}
+
+.reveal-field input {
+  padding-right: 52px;
+}
+
+.reveal-field .icon-btn {
+  position: absolute;
+  right: 2px;
+  top: calc(50% - 22px); /* no transform — keeps reduced-motion rules simple */
+  color: var(--text-2);
+}
+
+/* BMI guidance */
+.range-line {
+  color: var(--text-2);
+  font-weight: 600;
+  margin: 4px 0 0;
+}
+
+.tips-list {
+  margin: 8px 0 0;
+  padding-left: 1.15em;
+}
+
+.tips-list li {
+  font-size: 0.9375rem;
+  line-height: 1.45;
+  margin: 7px 0;
+  color: var(--text);
+}
+
+/* ---------- Toast ---------- */
+.toast {
+  position: fixed;
+  bottom: calc(24px + env(safe-area-inset-bottom));
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: rgba(0, 0, 0, 0.82);
+  color: #fff;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  letter-spacing: 0.005em;
+  padding: 10px 20px;
+  border-radius: 100px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s, transform 0.25s cubic-bezier(0.2, 0.9, 0.3, 1);
+  z-index: 100;
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  will-change: transform, opacity;
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* ---------- Accessibility signals ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .tool-card,
+  .tool-card:hover,
+  .tool-card:active,
+  .btn,
+  .btn:active {
+    transform: none !important;
+    transition: none !important;
+  }
+
+  .toast {
+    transform: translateX(-50%) !important;
+    transition: opacity 0.15s ease !important;
+  }
+
+  .icon-btn:active {
+    transform: none !important;
+  }
+
+  .strength-bar > div {
+    transition: none !important;
+  }
+
+  .topbar::after {
+    transition: none;
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .drawer {
+    background: var(--card);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+  .topbar {
+    background: var(--bg);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    border-bottom: 0.5px solid var(--sep);
+  }
+
+  .topbar::after {
+    display: none;
+  }
+
+  .toast {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    background: #000;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+  }
+}
+
+@media (prefers-contrast: more) {
+  .drawer {
+    background: var(--bg);
+    border-left: 1px solid var(--text-2);
+  }
+  .topbar {
+    background: var(--bg);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    border-bottom: 1px solid var(--text-2);
+  }
+
+  .topbar::after {
+    display: none;
+  }
+
+  .tool-card,
+  .panel {
+    border: 1px solid var(--text-2);
+  }
+
+  input[type='text'],
+  input[type='number'],
+  input[type='password'],
+  textarea,
+  select {
+    border-color: var(--text-2);
+    background: var(--bg);
+  }
+
+  .hint,
+  .footer,
+  .badge {
+    color: var(--text-2);
+  }
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 560px) {
+  .large-title {
+    font-size: 1.875rem;
+  }
+
+  #app,
+  .view-inner {
+    padding: 20px 16px 56px;
+  }
+
+  .view {
+    padding-top: calc(var(--topbar-h) + env(safe-area-inset-top));
+  }
+
+  .panel {
+    padding: 18px 16px;
+  }
+
+  .tool-grid {
+    grid-template-columns: repeat(auto-fill, minmax(136px, 1fr));
+    gap: 10px;
+  }
+
+  .input-row {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .result-value {
+    font-size: 1.75rem;
+  }
+
+  .pw-output {
+    flex-direction: column;
+  }
+
+  .pw-output .btn {
+    width: 100%;
+  }
+}
