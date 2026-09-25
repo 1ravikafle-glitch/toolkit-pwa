@@ -58,13 +58,9 @@ function renderHome(root: HTMLElement): void {
     grid.append(card);
   }
 
+  // No hero headline/subtitle: the topbar already says ToolKit, and leading
+  // straight with the tool grid gets users to their task one scroll faster.
   root.append(
-    el('h1', { class: 'large-title' }, 'ToolKit'),
-    el(
-      'p',
-      { class: 'subtitle' },
-      'Everyday utilities that are free, private and work offline. No ads, no accounts, no data collection.'
-    ),
     grid,
     el('h2', { class: 'section-title' }, 'Why ToolKit?'),
     el(
