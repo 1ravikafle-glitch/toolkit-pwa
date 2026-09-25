@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <script>
+      // No-flash appearance bootstrap: resolve theme + text size before first paint.
+      (function () {
+        try {
+          var t = null;
+          var s = null;
+          try {
+            t = JSON.parse(localStorage.getItem('tk-theme'));
+            s = JSON.parse(localStorage.getItem('tk-scale'));
+          } catch (e) {}
+          var dark =
+            t === 'dark' ||
+            (t !== 'light' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+          document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+          var px = { s: '15px', l: '18px', xl: '20px' }[s];
+          if (px) document.documentElement.style.fontSize = px;
+        } catch (e) {
+          /* fall back to light/default */
+        }
+      })();
+    </script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>ToolKit — Everyday Utilities</title>
+    <meta
+      name="description"
+      content="Free all-in-one everyday utilities: unit converter, BMI, tip splitter, password generator, word counter and QR tools. Works offline."
+    />
+    <link rel="icon" type="image/png" sizes="32x32" href="./favicon-32.png" />
+    <link rel="icon" href="./icon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="./apple-touch-icon.png" />
+    <link rel="manifest" href="./manifest.webmanifest" />
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#f5f5f7" />
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000000" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="ToolKit" />
+    <meta property="og:title" content="ToolKit — Everyday Utilities" />
+    <meta
+      property="og:description"
+      content="Six essential everyday tools in one free, private, offline-ready app."
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="./icon-512.png" />
+    <script type="module" crossorigin src="./assets/index-BBf5y8Xx.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-D-OdTFG-.css">
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="topbar-inner">
+        <a class="brand" href="#/">ToolKit</a>
+        <div class="topbar-right">
+          <button
+            id="menu-btn"
+            class="icon-btn"
+            aria-haspopup="dialog"
+            aria-expanded="false"
+            aria-label="Settings"
+            title="Settings"
+          ></button>
+          <button id="install-btn" class="btn pill" hidden>Install App</button>
+          <span class="badge">Free · Offline</span>
+        </div>
+      </div>
+    </header>
+
+    <main id="app"></main>
+
+    <footer class="footer">
+      <p>ToolKit · works offline · no ads · no tracking · free forever</p>
+    </footer>
+
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+    <noscript><p style="padding: 2rem; text-align: center">ToolKit requires JavaScript.</p></noscript>
+  </body>
+</html>
