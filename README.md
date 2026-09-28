@@ -8,10 +8,21 @@ A free, private, offline-ready PWA with six essential everyday tools. No ads, no
 
 | Channel | Link | Notes |
 | --- | --- | --- |
-| Android APK | [Download v1.0.0](https://github.com/1ravikafle-glitch/toolkit-pwa/releases/latest) | 289 KB, Android 5.0+, sideload |
+| Android APK | [Download the latest release](https://github.com/1ravikafle-glitch/toolkit-pwa/releases/latest) | ~290 KB, Android 5.0+, sideload |
 | Web (PWA) | [toolkit-pwa](https://1ravikafle-glitch.github.io/toolkit-pwa/) | "Add to Home Screen" |
 | F-Droid | Submitted — see [FDROID-SUBMISSION.md](FDROID-SUBMISSION.md) | build metadata + MR instructions |
 | IzzyOnDroid | Prepared — see [IZZY-SUBMISSION.md](IZZY-SUBMISSION.md) | pending AI-policy outcome |
+| Privacy | [PRIVACY.md](PRIVACY.md) | collects nothing, transmits nothing |
+
+## Screenshots
+
+| Home | Password Generator | QR Codes |
+| --- | --- | --- |
+| ![Home](fastlane/metadata/android/en-US/images/phoneScreenshots/1.png) | ![Password Generator](fastlane/metadata/android/en-US/images/phoneScreenshots/5.png) | ![QR Codes](fastlane/metadata/android/en-US/images/phoneScreenshots/7.png) |
+
+| Unit Converter | Tip & Split | BMI Calculator |
+| --- | --- | --- |
+| ![Unit Converter](fastlane/metadata/android/en-US/images/phoneScreenshots/2.png) | ![Tip & Split](fastlane/metadata/android/en-US/images/phoneScreenshots/3.png) | ![BMI Calculator](fastlane/metadata/android/en-US/images/phoneScreenshots/4.png) |
 
 ## Tools
 
