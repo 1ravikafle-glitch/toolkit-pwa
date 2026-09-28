@@ -2,7 +2,16 @@
 
 A free, private, offline-ready PWA with six essential everyday tools. No ads, no accounts, no data collection — everything runs on your device.
 
-**[Launch the app](../../#readme)** · works on phone and desktop, installable like a native app.
+**[Launch the web app](https://1ravikafle-glitch.github.io/toolkit-pwa/)** · works on phone and desktop, installable like a native app.
+
+## Install
+
+| Channel | Link | Notes |
+| --- | --- | --- |
+| Android APK | [Download v1.0.0](https://github.com/1ravikafle-glitch/toolkit-pwa/releases/latest) | 289 KB, Android 5.0+, sideload |
+| Web (PWA) | [toolkit-pwa](https://1ravikafle-glitch.github.io/toolkit-pwa/) | "Add to Home Screen" |
+| F-Droid | Submitted — see [FDROID-SUBMISSION.md](FDROID-SUBMISSION.md) | build metadata + MR instructions |
+| IzzyOnDroid | Prepared — see [IZZY-SUBMISSION.md](IZZY-SUBMISSION.md) | pending AI-policy outcome |
 
 ## Tools
 
@@ -28,6 +37,16 @@ A free, private, offline-ready PWA with six essential everyday tools. No ads, no
 
 Vite + vanilla TypeScript, zero runtime dependencies beyond the QR codec. Spring physics engine hand-rolled from Apple's *Designing Fluid Interfaces* parameters (damping ratio + response).
 
+## Releases
+
+New versions are one command — bump the version, rebuild web + APK, commit, tag and publish a GitHub release with the APK attached:
+
+```bash
+npm run release -- 1.1.0
+```
+
+See `scripts/release.sh` for what it does; Android build steps are in `android/`.
+
 ## Develop
 
 ```bash
@@ -39,7 +58,7 @@ npm run preview    # serve the production build
 
 ## Deploy
 
-Static hosting works out of the box (relative asset paths): GitHub Pages, Netlify, Vercel, or any web server — upload `dist/`. The repo includes a GitHub Actions workflow that builds and deploys to Pages on every push to `main`.
+Static hosting works out of the box (relative asset paths): GitHub Pages, Netlify, Vercel, or any web server — upload `dist/`. This repo deploys to GitHub Pages from the `gh-pages` branch; the latest build is always at the [live URL](https://1ravikafle-glitch.github.io/toolkit-pwa/).
 
 ## License
 
