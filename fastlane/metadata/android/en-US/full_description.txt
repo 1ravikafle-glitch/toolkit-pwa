@@ -1,0 +1,20 @@
+ToolKit packs six genuinely useful everyday utilities into one small, fast app - with no ads, no tracking and no account.
+
+What's inside:
+
+• Unit Converter - length, weight, temperature, volume, area, speed and more, with a quick two-column picker.
+• Tip & Split - set the tip, split the bill, round up; presets from 0% to 25%.
+• BMI - metric or imperial, with healthy range guidance and handy tips.
+• Password Generator - strong random passwords with length and character controls, plus a private list of saved passwords kept only on your device.
+• Word Counter - count characters, words, sentences and reading time as you type or paste.
+• QR Codes - create QR codes for links, text, Wi-Fi and more, ready to save or share.
+
+Everything works offline. All six tools are built into the app, so ToolKit keeps working in airplane mode, on a plane or with no signal.
+
+Your data never leaves the device. ToolKit sends nothing about you anywhere: no analytics, no ad SDKs, no cookies and no account.
+
+Choose light, dark or system theme, and scale the text size to S, L or XL for comfortable reading.
+
+ToolKit is free and open source software released under the MIT licence. The complete source code is available on GitHub.
+
+No ads. No tracking. Free forever.

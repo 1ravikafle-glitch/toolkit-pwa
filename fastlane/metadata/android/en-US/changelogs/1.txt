@@ -1,0 +1,1 @@
+First release: unit converter, tip & split, BMI, password generator, word counter and QR tools - all offline, ad-free and with no tracking.
