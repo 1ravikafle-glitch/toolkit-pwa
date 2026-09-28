@@ -11,17 +11,18 @@ Everything F-Droid needs is already in this repository:
 | FOSS license file | ✅ `LICENSE` (MIT) |
 | Real, buildable source | ✅ Vite PWA + `android/` Gradle wrapper |
 | Fastlane metadata in source repo | ✅ `fastlane/metadata/android/en-US/` |
-| Release tag | ✅ `v1.0.0` (versionCode 1) |
-| Changelog for the release | ✅ `fastlane/metadata/android/en-US/changelogs/1.txt` |
+| Release tag | ✅ `v1.0.1` (versionCode 10001; v1.0.0 was the pipeline test baseline) |
+| Changelog for the release | ✅ `fastlane/metadata/android/en-US/changelogs/10001.txt` |
 | No proprietary dependencies | ✅ none (no Firebase/GMS) |
 
 Metadata layout (`fastlane/metadata/android/en-US/`):
 `title.txt`, `short_description.txt`, `full_description.txt`,
-`changelogs/1.txt`, `images/icon.png` (512), `images/featureGraphic.png` (1024×500),
+`changelogs/10001.txt`, `images/icon.png` (512), `images/featureGraphic.png` (1024×500),
 `images/phoneScreenshots/1..7.png` (780×1688).
 
 A locally built, signed APK (for sideloading/testing only — F-Droid always
-builds and signs its own): `dist/ToolKit-v1.0.0.apk`
+builds and signs its own): `dist/ToolKit-1.0.1.apk`, also attached to the
+[v1.0.1 GitHub release](https://github.com/1ravikafle-glitch/toolkit-pwa/releases/latest)
 Keystore: `android/keystore/toolkit.jks` — **never committed; back it up**
 (store/key password: `toolkit-release-2026`, alias `toolkit`).
 Losing it means you can never ship an update under the same signature.
@@ -55,9 +56,9 @@ RepoType: git
 Repo: https://github.com/1ravikafle-glitch/toolkit-pwa
 
 Builds:
-  - versionName: 1.0.0
-    versionCode: 1
-    commit: v1.0.0
+  - versionName: 1.0.1
+    versionCode: 10001
+    commit: v1.0.1
     subdir: android/app
     sudo:
       - apt-get update
@@ -69,8 +70,8 @@ Builds:
 
 AutoUpdateMode: Version v%v
 UpdateCheckMode: Tags
-CurrentVersion: 1.0.0
-CurrentVersionCode: 1
+CurrentVersion: 1.0.1
+CurrentVersionCode: 10001
 ```
 
 How the build works on F-Droid's server: it checks out tag `v1.0.0`, runs the
