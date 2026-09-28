@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # ToolKit release automation.
 #
-#   ./scripts/release.sh 1.2.3
+#   ./scripts/release.sh <version> [changelog text]
+#   ./scripts/release.sh 1.2.3 "Add dark-amoled theme; fix converter rounding"
 #
 # Steps:
 #   1. verify clean tree on main, up to date with origin
@@ -18,8 +19,9 @@
 set -euo pipefail
 
 VERSION="${1:-}"
+CHANGELOG_MSG="${2:-}"
 if [[ ! "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-  echo "usage: $0 <version>   e.g. $0 1.1.0" >&2
+  echo "usage: $0 <version> [changelog text]   e.g. $0 1.1.0 'New theme, faster QR'" >&2
   exit 1
 fi
 
@@ -50,9 +52,13 @@ echo "==> bumped $APP_GRADLE and package.json to $VERSION ($VERSION_CODE)"
 # --- 3. changelog -----------------------------------------------------------
 CHANGELOG="fastlane/metadata/android/en-US/changelogs/$VERSION_CODE.txt"
 if [[ ! -f "$CHANGELOG" ]]; then
-  echo "Write the changelog for versionCode $VERSION_CODE (max 500 chars)." >&2
-  "${EDITOR:-vi}" "$CHANGELOG"
-  [[ -f "$CHANGELOG" ]] || { echo "missing $CHANGELOG" >&2; exit 1; }
+  if [[ -n "$CHANGELOG_MSG" ]]; then
+    printf '%s\n' "$CHANGELOG_MSG" > "$CHANGELOG"
+  else
+    echo "Write the changelog for versionCode $VERSION_CODE (max 500 chars)." >&2
+    "${EDITOR:-vi}" "$CHANGELOG"
+    [[ -f "$CHANGELOG" ]] || { echo "missing $CHANGELOG" >&2; exit 1; }
+  fi
 fi
 
 # --- 4. web build -----------------------------------------------------------
